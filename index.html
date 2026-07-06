@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Ticket - FIFA World Cup 26</title>
+  <style>
+    :root {
+      --primary: #1a1a2e;
+      --accent: #e63946;
+      --gold: #f4a261;
+      --light: #f8f9fa;
+      --dark: #0f0f1a;
+      --gray: #6c757d;
+      --border: #dee2e6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #e9ecef; min-height: 100vh; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 24px; }
+    .header h1 { color: var(--primary); font-size: 1.6rem; margin-bottom: 4px; }
+    .header p { color: var(--gray); font-size: 0.9rem; }
+    
+    .ticket-wrapper { 
+      background: white; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15); 
+      overflow: hidden; 
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .ticket-physical {
+      display: flex;
+      min-height: 280px;
+    }
+    .ticket-left {
+      flex: 1;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .ticket-left::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 20px;
+      bottom: 20px;
+      width: 1px;
+      background: repeating-linear-gradient(to bottom, var(--border) 0, var(--border) 8px, transparent 8px, transparent 16px);
+    }
+    .ticket-right {
+      width: 200px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+      color: white;
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+    .ticket-right::before {
+      content: '';
+      position: absolute;
+      left: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      background: #e9ecef;
+      border-radius: 50%;
+    }
+    
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .event-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+    .event-title span {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+    .ticket-badge {
+      background: var(--accent);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .match-info {
+      text-align: center;
+      margin: 12px 0;
+    }
+    .match-teams {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .match-teams .vs {
+      color: var(--accent);
+      margin: 0 8px;
+    }
+    .match-meta {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+    .match-meta span { display: flex; align-items: center; gap: 4px; }
+    
+    .seat-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .seat-cell {
+      text-align: center;
+      padding: 8px 4px;
+      background: var(--light);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .seat-cell .label {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      color: var(--gray);
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .seat-cell .label .es { display: block; font-size: 0.55rem; opacity: 0.7; }
+    .seat-cell .value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .holder-info { font-size: 0.75rem; color: var(--gray); }
+    .holder-info strong { color: var(--primary); font-size: 0.85rem; }
+    .ticket-id {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      color: var(--gray);
+      text-align: right;
+    }
+    .ticket-id strong { color: var(--primary); display: block; }
+    
+    .logo-box {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1;
+      flex-direction: column;
+    }
+    .logo-box small { font-size: 0.6rem; display: block; }
+    .event-name-right {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+    .event-name-right span {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+    .category-badge {
+      background: var(--gold);
+      color: var(--dark);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin: 12px 0;
+    }
+    .qr-placeholder {
+      width: 100px;
+      height: 100px;
+      background: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 8px;
+    }
+    .qr-placeholder svg { width: 80px; height: 80px; }
+    
+    .mobile-ticket {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    }
+    .mobile-header {
+      background: var(--primary);
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+    .mobile-header .logo-m {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 12px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-weight: 900;
+      font-size: 1.4rem;
+    }
+    .mobile-body { padding: 24px; }
+    .mobile-match {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .mobile-match h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; }
+    .mobile-meta { color: var(--gray); font-size: 0.85rem; margin-bottom: 4px; }
+    .mobile-seats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .m-seat {
+      background: var(--light);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .m-seat .lbl { font-size: 0.6rem; color: var(--gray); text-transform: uppercase; }
+    .m-seat .lbl .es { display: block; font-size: 0.55rem; }
+    .m-seat .val { font-size: 1rem; font-weight: 700; color: var(--primary); }
+    .mobile-details {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row .lbl { color: var(--gray); }
+    .detail-row .val { font-weight: 600; color: var(--primary); }
+    .mobile-qr {
+      text-align: center;
+      padding: 20px;
+      background: var(--light);
+    }
+    .mobile-qr svg { width: 140px; height: 140px; }
+    
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 12px 28px;
+      border-radius: 10px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--dark); transform: translateY(-1px); }
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--primary); }
+    
+    .receipt-section {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    .receipt-section h3 {
+      font-size: 1rem;
+      color: var(--primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      font-size: 0.85rem;
+      border-bottom: 1px dashed var(--border);
+    }
+    .receipt-row:last-child { border-bottom: none; font-weight: 700; font-size: 0.95rem; }
+    .receipt-row .lbl { color: var(--gray); }
+    .receipt-row .val { color: var(--primary); }
+    
+    .view-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .toggle-btn {
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: white;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray);
+    }
+    .toggle-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    @media print {
+      body { background: white; padding: 0; }
+      .actions, .view-toggle, .receipt-section, .header { display: none !important; }
+      .ticket-wrapper { box-shadow: none; border: 1px solid #000; }
+    }
+    
+    @media (max-width: 700px) {
+      .ticket-physical { display: none; }
+      .mobile-ticket { display: block; }
+      .view-toggle { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎟️ Your Ticket / Tu Boleto</h1>
+      <p>Match 92 — FIFA World Cup 26</p>
+    </div>
+    
+    <div class="view-toggle" id="viewToggle">
+      <button class="toggle-btn active" onclick="showView('physical')">🎫 Physical Ticket</button>
+      <button class="toggle-btn" onclick="showView('mobile')">📱 Mobile Pass</button>
+    </div>
+    
+    <div class="ticket-wrapper" id="physicalTicket">
+      <div class="ticket-physical">
+        <div class="ticket-left">
+          <div class="top-row">
+            <div>
+              <div class="event-title">
+                FIFA WORLD CUP 26™
+                <span>Copa Mundial de la FIFA 26™</span>
+              </div>
+            </div>
+            <div class="ticket-badge">Match 92</div>
+          </div>
+          
+          <div class="match-info">
+            <div class="match-teams">France <span class="vs">VS</span> Morocco</div>
+            <div class="match-teams" style="font-size:0.8rem; color:var(--gray); margin-top:2px;">Francia <span class="vs">VS</span> Marruecos</div>
+            <div class="match-meta">
+              <span>📅 09 JUL 2026, 4:00 PM</span>
+              <span>📍 Boston Stadium (Gillette Stadium)</span>
+            </div>
+          </div>
+          
+          <div class="seat-grid">
+            <div class="seat-cell">
+              <div class="label">Entrance<br><span class="es">Entrada</span></div>
+              <div class="value" id="entranceVal">East End Zone</div>
+            </div>
+            <div class="seat-cell">
+              <div class="label">Gate<br><span class="es">Puerta</span></div>
+              <div class="value" id="gateVal">East</div>
+            </div>
+            <div class="seat-cell">
+              <div class="label">Section<br><span class="es">Sección</span></div>
+              <div class="value" id="sectionVal">242</div>
+            </div>
+            <div class="seat-cell">
+              <div class="label">Row<br><span class="es">Fila</span></div>
+              <div class="value" id="rowVal">1</div>
+            </div>
+            <div class="seat-cell">
+              <div class="label">Seat<br><span class="es">Asiento</span></div>
+              <div class="value" id="seatVal">36</div>
+            </div>
+          </div>
+          
+          <div class="bottom-row">
+            <div class="holder-info">
+              <div>Ticket Holder / Titular: <strong id="holderName">Sophie Stewart</strong></div>
+              <div style="margin-top:2px;">Category / Categoría: <strong id="catVal">Category 1</strong></div>
+            </div>
+            <div class="ticket-id">
+              <strong id="ticketNum">01017580911</strong>
+              Ticket Number<br>Número de Boleto
+            </div>
+          </div>
+        </div>
+        
+        <div class="ticket-right">
+          <div class="logo-box">
+            26
+            <small>FIFA</small>
+          </div>
+          <div class="event-name-right">
+            WORLD CUP
+            <span>Copa Mundial</span>
+          </div>
+          <div class="category-badge" id="catBadge">CAT 1</div>
+          <div class="qr-placeholder" id="qrCode">
+            <svg viewBox="0 0 100 100">
+              <rect x="10" y="10" width="25" height="25" fill="none" stroke="#1a1a2e" stroke-width="3"/>
+              <rect x="14" y="14" width="17" height="17" fill="#1a1a2e"/>
+              <rect x="65" y="10" width="25" height="25" fill="none" stroke="#1a1a2e" stroke-width="3"/>
+              <rect x="69" y="14" width="17" height="17" fill="#1a1a2e"/>
+              <rect x="10" y="65" width="25" height="25" fill="none" stroke="#1a1a2e" stroke-width="3"/>
+              <rect x="14" y="69" width="17" height="17" fill="#1a1a2e"/>
+              <rect x="45" y="10" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="45" y="25" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="45" y="40" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="10" y="45" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="25" y="45" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="40" y="45" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="55" y="45" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="70" y="45" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="85" y="45" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="45" y="55" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="45" y="70" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="45" y="85" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="55" y="65" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="65" y="55" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="70" y="70" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="80" y="80" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="85" y="65" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="65" y="85" width="8" height="8" fill="#1a1a2e"/>
+              <rect x="55" y="80" width="8" height="8" fill="#1a1a2e"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mobile-ticket" id="mobileTicket" style="display:none;">
+      <div class="mobile-header">
+        <div class="logo-m">26</div>
+        <h2>FIFA WORLD CUP 26™</h2>
+        <p>Copa Mundial de la FIFA 26™</p>
+      </div>
+      <div class="mobile-body">
+        <div class="mobile-match">
+          <h3>Match 92 — France vs Morocco</h3>
+          <div class="mobile-meta">📅 09 JUL 2026, 4:00 PM</div>
+          <div class="mobile-meta">📍 Boston Stadium (Gillette Stadium)</div>
+        </div>
+        <div class="mobile-seats">
+          <div class="m-seat">
+            <div class="lbl">Entrance<span class="es">Entrada</span></div>
+            <div class="val" id="mEntrance">East End</div>
+          </div>
+          <div class="m-seat">
+            <div class="lbl">Gate<span class="es">Puerta</span></div>
+            <div class="val" id="mGate">East</div>
+          </div>
+          <div class="m-seat">
+            <div class="lbl">Section<span class="es">Sección</span></div>
+            <div class="val" id="mSection">242</div>
+          </div>
+          <div class="m-seat">
+            <div class="lbl">Row<span class="es">Fila</span></div>
+            <div class="val" id="mRow">1</div>
+          </div>
+          <div class="m-seat">
+            <div class="lbl">Seat<span class="es">Asiento</span></div>
+            <div class="val" id="mSeat">36</div>
+          </div>
+          <div class="m-seat">
+            <div class="lbl">Category<span class="es">Categoría</span></div>
+            <div class="val" id="mCat">1</div>
+          </div>
+        </div>
+        <div class="mobile-details">
+          <div class="detail-row">
+            <span class="lbl">Ticket Holder / Titular</span>
+            <span class="val" id="mHolder">Sophie Stewart</span>
+          </div>
+          <div class="detail-row">
+            <span class="lbl">Ticket Number / N° de Boleto</span>
+            <span class="val" id="mTicketNum">01017580911</span>
+          </div>
+          <div class="detail-row">
+            <span class="lbl">Match / Partido</span>
+            <span class="val">#92</span>
+          </div>
+        </div>
+      </div>
+      <div class="mobile-qr">
+        <svg viewBox="0 0 100 100">
+          <rect x="10" y="10" width="25" height="25" fill="none" stroke="#1a1a2e" stroke-width="3"/>
+          <rect x="14" y="14" width="17" height="17" fill="#1a1a2e"/>
+          <rect x="65" y="10" width="25" height="25" fill="none" stroke="#1a1a2e" stroke-width="3"/>
+          <rect x="69" y="14" width="17" height="17" fill="#1a1a2e"/>
+          <rect x="10" y="65" width="25" height="25" fill="none" stroke="#1a1a2e" stroke-width="3"/>
+          <rect x="14" y="69" width="17" height="17" fill="#1a1a2e"/>
+          <rect x="45" y="10" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="45" y="25" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="45" y="40" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="10" y="45" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="25" y="45" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="40" y="45" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="55" y="45" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="70" y="45" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="85" y="45" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="45" y="55" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="45" y="70" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="45" y="85" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="55" y="65" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="65" y="55" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="70" y="70" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="80" y="80" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="85" y="65" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="65" y="85" width="8" height="8" fill="#1a1a2e"/>
+          <rect x="55" y="80" width="8" height="8" fill="#1a1a2e"/>
+        </svg>
+        <p>Scan at gate / Escanear en la puerta</p>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button class="btn btn-primary" onclick="window.print()">
+        🖨️ Print Ticket / Imprimir
+      </button>
+      <button class="btn btn-secondary" onclick="downloadTicket()">
+        💾 Save as Image / Guardar
+      </button>
+    </div>
+    
+    <div class="receipt-section">
+      <h3>🧾 Purchase Receipt / Recibo de Compra</h3>
+      <div class="receipt-row">
+        <span class="lbl">Event / Evento</span>
+        <span class="val">FIFA World Cup 26 — Match 92</span>
+      </div>
+      <div class="receipt-row">
+        <span class="lbl">Date & Time / Fecha y Hora</span>
+        <span class="val">09 JUL 2026, 4:00 PM</span>
+      </div>
+      <div class="receipt-row">
+        <span class="lbl">Venue / Lugar</span>
+        <span class="val">Boston Stadium (Gillette Stadium)</span>
+      </div>
+      <div class="receipt-row">
+        <span class="lbl">Ticket Holder / Titular</span>
+        <span class="val" id="rHolder">Sophie Stewart</span>
+      </div>
+      <div class="receipt-row">
+        <span class="lbl">Seat / Asiento</span>
+        <span class="val" id="rSeat">Section 242, Row 1, Seat 36</span>
+      </div>
+      <div class="receipt-row">
+        <span class="lbl">Category / Categoría</span>
+        <span class="val">Category 1</span>
+      </div>
+      <div class="receipt-row">
+        <span class="lbl">Ticket Number / N° de Boleto</span>
+        <span class="val" id="rTicketNum">01017580911</span>
+      </div>
+      <div class="receipt-row">
+        <span class="lbl">Transaction ID / ID Transacción</span>
+        <span class="val">TXN-WC26-789456123</span>
+      </div>
+      <div class="receipt-row">
+        <span class="lbl">Purchase Date / Fecha de Compra</span>
+        <span class="val">06 JUL 2026</span>
+      </div>
+      <div class="receipt-row">
+        <span class="lbl">Payment Method / Método de Pago</span>
+        <span class="val">Credit Card / Tarjeta de Crédito •••• 4242</span>
+      </div>
+      <div class="receipt-row">
+        <span class="lbl">Total Paid / Total Pagado</span>
+        <span class="val" style="color:var(--accent); font-size:1.1rem;">$450.00 USD</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Read URL parameters to customize ticket per buyer
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name') || 'Sophie Stewart';
+n    const seat = params.get('seat') || '36';
+n    const row = params.get('row') || '1';
+n    const section = params.get('section') || '242';
+n    const gate = params.get('gate') || 'East';
+n    const entrance = params.get('entrance') || 'East End Zone';
+n    const category = params.get('cat') || '1';
+n    const ticketNum = params.get('id') || '01017580911';
+n    
+n    // Update physical ticket
+n    document.getElementById('holderName').textContent = name;
+n    document.getElementById('seatVal').textContent = seat;
+n    document.getElementById('rowVal').textContent = row;
+n    document.getElementById('sectionVal').textContent = section;
+n    document.getElementById('gateVal').textContent = gate;
+n    document.getElementById('entranceVal').textContent = entrance;
+n    document.getElementById('catVal').textContent = 'Category ' + category;
+n    document.getElementById('catBadge').textContent = 'CAT ' + category;
+n    document.getElementById('ticketNum').textContent = ticketNum;
+n    
+n    // Update mobile ticket
+n    document.getElementById('mHolder').textContent = name;
+n    document.getElementById('mSeat').textContent = seat;
+n    document.getElementById('mRow').textContent = row;
+n    document.getElementById('mSection').textContent = section;
+n    document.getElementById('mGate').textContent = gate;
+n    document.getElementById('mEntrance').textContent = entrance.replace(' Zone', '');
+n    document.getElementById('mCat').textContent = category;
+n    document.getElementById('mTicketNum').textContent = ticketNum;
+n    
+n    // Update receipt
+n    document.getElementById('rHolder').textContent = name;
+n    document.getElementById('rSeat').textContent = 'Section ' + section + ', Row ' + row + ', Seat ' + seat;
+n    document.getElementById('rTicketNum').textContent = ticketNum;
+n    
+n    // Update page title
+n    document.title = 'Ticket for ' + name + ' — FIFA World Cup 26';
+n    
+n    function showView(view) {
+n      const physical = document.getElementById('physicalTicket');\n      const mobile = document.getElementById('mobileTicket');\n      const btns = document.querySelectorAll('.toggle-btn');\n      btns.forEach(b => b.classList.remove('active'));\n      if (view === 'physical') {\n        physical.style.display = 'block';\n        mobile.style.display = 'none';\n        btns[0].classList.add('active');\n      } else {\n        physical.style.display = 'none';\n        mobile.style.display = 'block';\n        btns[1].classList.add('active');\n      }\n    }\n    \n    function downloadTicket() {\n      alert('To download as image: Right-click the ticket and select \"Save image as...\"\\n\\nPara descargar como imagen: Clic derecho en el boleto y selecciona \"Guardar imagen como...\"');\n    }\n  </script>
+n</body>\n</html>
+
